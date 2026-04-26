@@ -12,6 +12,7 @@ export interface Post {
 export interface SiteConfig {
   title: string;
   description: string;
+  icp_number: string;
 }
 
 export type MediaType = 'image' | 'video' | 'document' | 'audio';

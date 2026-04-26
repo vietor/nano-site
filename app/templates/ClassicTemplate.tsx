@@ -70,8 +70,9 @@ export default function ClassicHomeTemplate({
         )}
       </main>
       <footer className="border-t bg-white mt-auto">
-        <div className="max-w-3xl mx-auto px-4 py-4 text-center text-zinc-500 text-sm">
-          © {new Date().getFullYear()} {config.title}
+        <div className={`max-w-3xl mx-auto px-4 py-4 text-zinc-500 text-sm ${config.icp_number ? 'flex justify-between' : 'text-center'}`}>
+          {config.icp_number ? <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">{config.icp_number}</a> : null}
+          <span>© {new Date().getFullYear()} {config.title}</span>
         </div>
       </footer>
     </div>

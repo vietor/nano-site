@@ -98,6 +98,18 @@ export default function SettingsPage() {
               required
             />
           </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-[#3c434a] mb-2">
+              ICP 备案号
+            </label>
+            <input
+              type="text"
+              value={config.icp_number}
+              onChange={e => setConfig({ ...config, icp_number: e.target.value })}
+              className="w-full"
+              placeholder="可选"
+            />
+          </div>
 
           <div className="flex items-center gap-4">
             <button type="submit" className="wp-admin-btn wp-admin-btn-primary">

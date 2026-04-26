@@ -18,12 +18,14 @@ export async function PUT(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { title, description } = body as SiteConfig;
+  const title = (body.title ?? '').trim();
+  const description = (body.description ?? '').trim();
+  const icp_number = (body.icp_number ?? '').trim();
 
   if (!title || !description) {
     return NextResponse.json({ error: '无效的配置' }, { status: 400 });
   }
 
-  saveConfig({ title, description });
-  return NextResponse.json({ title, description });
+  saveConfig({ title, description, icp_number });
+  return NextResponse.json({ title, description, icp_number });
 }
