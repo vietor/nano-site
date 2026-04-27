@@ -1,13 +1,14 @@
-import type { SiteConfig } from '@/app/shared/types';
-import { getDb } from './db';
+import { cache } from "react";
+import type { SiteConfig } from "@/app/shared/types";
+import { getDb } from "./db";
 
-export const defaultConfig: SiteConfig = {
-  title: 'Nano Site',
-  description: 'A minimal web site',
-  icp_number: '',
+const defaultConfig: SiteConfig = {
+  title: "Nano Site",
+  description: "A minimal web site",
+  icp_number: "",
 };
 
-export function loadConfig(): SiteConfig {
+export const loadConfig = cache((): SiteConfig => {
   const db = getDb();
   const rows = db.prepare("SELECT key, value FROM config WHERE key IN ('title', 'description', 'icp_number')").all() as { key: string; value: string }[];
   const map = Object.fromEntries(rows.map(r => [r.key, r.value]));
@@ -17,7 +18,7 @@ export function loadConfig(): SiteConfig {
     description: map.description ?? defaultConfig.description,
     icp_number: map.icp_number ?? defaultConfig.icp_number,
   };
-}
+});
 
 export function saveConfig(config: SiteConfig): void {
   const db = getDb();
