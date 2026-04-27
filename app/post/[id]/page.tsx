@@ -9,7 +9,7 @@ export default async function PostPage({
   const { id } = await params;
   const config = loadConfig();
   const post = getPostById(Number(id));
-  const viewPost = post && post.status !== 'published'? post: null;
+  const viewPost = (post && post.status === 'published')? post: null;
 
   return <PostTemplate config={config} post={viewPost} />;
 }
