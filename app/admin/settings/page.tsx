@@ -25,16 +25,17 @@ export default function SettingsPage() {
     e.preventDefault();
     if (!config) return;
 
-    await fetch('/api/config', {
+    const res = await fetch('/api/config', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(config),
-    })
-      .then(() => {
-        setSaved(true);
-        setTimeout(() => setSaved(false), 2000);
-      })
-      .catch(() => {});
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setConfig(data);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    }
   };
 
   const handlePasswordChange = async (e: React.FormEvent) => {
