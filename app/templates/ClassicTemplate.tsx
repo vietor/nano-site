@@ -1,12 +1,35 @@
 "use client";
 
 import Link from "next/link";
+import type { SiteConfig } from "@/app/shared/types";
 import { MarkdownViewer } from "@/app/shared/md";
 import {
   formatDate,
   type HomeTemplateProps,
   type PostTemplateProps,
 } from "./shared";
+
+function SiteHeader({ config }: { config: SiteConfig }) {
+  return (
+    <header className="border-b bg-white">
+      <div className="max-w-3xl mx-auto px-4 py-4 justify-between items-center">
+        <h1 className="text-2xl font-bold text-zinc-900">{config.title}</h1>
+        <p className="text-zinc-400 mt-1">{config.description}</p>
+      </div>
+    </header>
+  );
+}
+
+function SiteFooter({ config }: { config: SiteConfig }) {
+  return (
+    <footer className="border-t bg-white mt-auto">
+      <div className={`max-w-3xl mx-auto px-4 py-4 text-zinc-500 text-sm ${config.icp_number ? 'flex justify-between' : 'text-center'}`}>
+        {config.icp_number ? <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">{config.icp_number}</a> : null}
+        <span>© {new Date().getFullYear()} {config.title}</span>
+      </div>
+    </footer>
+  );
+}
 
 export default function ClassicHomeTemplate({
   config,
@@ -16,13 +39,8 @@ export default function ClassicHomeTemplate({
 }: HomeTemplateProps) {
   return (
     <div className="min-h-screen bg-zinc-50">
-      <header className="border-b bg-white">
-        <div className="max-w-3xl mx-auto px-4 py-4 justify-between items-center">
-          <h1 className="text-2xl font-bold text-zinc-900">{config.title}</h1>
-          <p className="text-zinc-400 mt-1">{config.description}</p>
-        </div>
-      </header>
-      <main className="max-w-3xl mx-auto px-4 py-8">
+      <SiteHeader config={config} />
+      <main className="max-w-3xl mx-auto px-4 py-6">
         {posts.length === 0 ? (
           <p className="text-center text-zinc-500 py-12">暂无文章</p>
         ) : (
@@ -69,62 +87,34 @@ export default function ClassicHomeTemplate({
           </div>
         )}
       </main>
-      <footer className="border-t bg-white mt-auto">
-        <div className={`max-w-3xl mx-auto px-4 py-4 text-zinc-500 text-sm ${config.icp_number ? 'flex justify-between' : 'text-center'}`}>
-          {config.icp_number ? <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">{config.icp_number}</a> : null}
-          <span>© {new Date().getFullYear()} {config.title}</span>
-        </div>
-      </footer>
+      <SiteFooter config={config} />
     </div>
   );
 }
 
-export function ClassicPostTemplate({ loading, post }: PostTemplateProps) {
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
-        <p className="text-zinc-500">加载中...</p>
-      </div>
-    );
-  }
-
-  if (!post) {
-    return (
-      <div className="min-h-screen bg-zinc-50">
-        <header className="border-b bg-white">
-          <div className="max-w-3xl mx-auto px-4 py-6">
-            <Link prefetch={false} href="/" className="text-zinc-600 hover:text-zinc-900">
-              返回首页
-            </Link>
-          </div>
-        </header>
-        <main className="max-w-3xl mx-auto px-4 py-8">
-          <p className="text-center text-zinc-500">文章不存在</p>
-        </main>
-      </div>
-    );
-  }
-
+export function ClassicPostTemplate({ config, post }: PostTemplateProps) {
   return (
     <div className="min-h-screen bg-zinc-50">
-      <header className="border-b bg-white">
-        <div className="max-w-3xl mx-auto px-4 py-6">
-          <Link prefetch={false} href="/" className="text-zinc-600 hover:text-zinc-900">
-            返回首页
-          </Link>
-        </div>
-      </header>
-      <main className="max-w-3xl mx-auto px-4 py-8">
-        <article className="bg-white rounded-lg p-8 shadow-sm border border-zinc-200">
-          <p className="text-zinc-400 text-sm mb-4">
-            发布于 {formatDate(post.createdAt)}
-          </p>
-          <h1 className="text-2xl font-semibold mb-4 text-zinc-900">
-            {post.title}
-          </h1>
-          <MarkdownViewer content={post.content} />
-        </article>
+      <SiteHeader config={config} />
+      <main className="max-w-3xl mx-auto px-4 py-6">
+        <Link prefetch={false} href="/" className="text-zinc-600 hover:text-zinc-900 text-sm inline-block">
+          返回首页
+        </Link>
+        {post ? (
+          <article className="bg-white rounded-lg p-8 shadow-sm border border-zinc-200 mt-6">
+            <p className="text-zinc-400 text-sm mb-4">
+              发布于 {formatDate(post.createdAt)}
+            </p>
+            <h1 className="text-2xl font-semibold mb-4 text-zinc-900">
+              {post.title}
+            </h1>
+            <MarkdownViewer content={post.content} />
+          </article>
+        ) : (
+          <p className="text-center text-zinc-500 mt-12">文章不存在</p>
+        )}
       </main>
+      <SiteFooter config={config} />
     </div>
   );
 }

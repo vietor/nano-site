@@ -8,7 +8,7 @@ export interface HomeTemplateProps {
 }
 
 export interface PostTemplateProps {
-  loading: boolean;
+  config: SiteConfig;
   post: Post | null;
 }
 
