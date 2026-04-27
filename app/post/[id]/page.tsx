@@ -1,4 +1,3 @@
-import { notFound } from 'next/navigation';
 import { loadConfig, getPostById } from '@/app/lib/model';
 import { PostTemplate } from '@/app/templates';
 
@@ -10,10 +9,7 @@ export default async function PostPage({
   const { id } = await params;
   const config = loadConfig();
   const post = getPostById(Number(id));
+  const viewPost = post && post.status !== 'published'? post: null;
 
-  if (!post || post.status === 'draft') {
-    notFound();
-  }
-
-  return <PostTemplate config={config} post={post} />;
+  return <PostTemplate config={config} post={viewPost} />;
 }

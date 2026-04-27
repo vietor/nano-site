@@ -111,7 +111,7 @@ export function ClassicPostTemplate({ config, post }: PostTemplateProps) {
             <MarkdownViewer content={post.content} />
           </article>
         ) : (
-          <p className="text-center text-zinc-500 mt-12">文章不存在</p>
+          <p className="text-center text-zinc-500 mt-12 mb-12">文章不存在</p>
         )}
       </main>
       <SiteFooter config={config} />
