@@ -30,22 +30,6 @@
   overflow-y: auto;
 }
 
-.wp-admin-logo {
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-bottom: 1px solid #2c3338;
-  color: #f0f0f1;
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.wp-admin-logo:hover {
-  color: #72aee6;
-  text-decoration: none;
-}
-
 .wp-admin-menu {
   list-style: none;
   padding: 0;

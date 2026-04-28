@@ -48,9 +48,6 @@ export default function AdminLayout({
   return (
     <div className="wp-admin">
       <nav className="wp-admin-sidebar">
-        <a href="/admin" className="wp-admin-logo">
-          <span>管理后台</span>
-        </a>
         <ul className="wp-admin-menu">
           <li>
             <a href="/admin/posts" className={isActive('/admin/posts') ? 'active' : ''}>
