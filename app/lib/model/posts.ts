@@ -8,6 +8,7 @@ function mapRow(r: Record<string, unknown>): Post {
     title: r.title as string,
     content: r.content as string,
     status: (r.status as PostStatus) || 'published',
+    views: (r.views as number) ?? 0,
     createdAt: r.createdAt as string,
     updatedAt: r.updatedAt as string,
   };
@@ -22,8 +23,8 @@ export function getPagedPosts(page: number = 1, pageSize: number = PAGE_SIZE, st
   const totalPages = Math.ceil(total / pageSize);
   const offset = (page - 1) * pageSize;
   const rows = status
-    ? db.prepare(`SELECT id, title, content, status, created_at as createdAt, updated_at as updatedAt FROM posts WHERE status = ? ORDER BY created_at DESC LIMIT ? OFFSET ?`).all(status, pageSize, offset) as Record<string, unknown>[]
-    : db.prepare('SELECT id, title, content, status, created_at as createdAt, updated_at as updatedAt FROM posts ORDER BY created_at DESC LIMIT ? OFFSET ?').all(pageSize, offset) as Record<string, unknown>[];
+    ? db.prepare(`SELECT id, title, content, status, views, created_at as createdAt, updated_at as updatedAt FROM posts WHERE status = ? ORDER BY created_at DESC LIMIT ? OFFSET ?`).all(status, pageSize, offset) as Record<string, unknown>[]
+    : db.prepare('SELECT id, title, content, status, views, created_at as createdAt, updated_at as updatedAt FROM posts ORDER BY created_at DESC LIMIT ? OFFSET ?').all(pageSize, offset) as Record<string, unknown>[];
   return {
     posts: rows.map(mapRow),
     total,
@@ -37,9 +38,24 @@ export function getPagedPublishedPosts(page: number = 1, pageSize: number = PAGE
 
 export function getPostById(id: number): Post | undefined {
   const db = getDb();
-  const row = db.prepare('SELECT id, title, content, status, created_at as createdAt, updated_at as updatedAt FROM posts WHERE id = ?').get(id) as Record<string, unknown> | undefined;
+  const row = db.prepare('SELECT id, title, content, status, views, created_at as createdAt, updated_at as updatedAt FROM posts WHERE id = ?').get(id) as Record<string, unknown> | undefined;
   if (!row) return undefined;
   return mapRow(row);
+}
+
+export function getAdjacentPosts(id: number): { prev: Post | null; next: Post | null } {
+  const db = getDb();
+  const prevRow = db.prepare(`SELECT id, title, content, status, views, created_at as createdAt, updated_at as updatedAt FROM posts WHERE status = 'published' AND created_at > (SELECT created_at FROM posts WHERE id = ?) ORDER BY created_at ASC LIMIT 1`).get(id) as Record<string, unknown> | undefined;
+  const nextRow = db.prepare(`SELECT id, title, content, status, views, created_at as createdAt, updated_at as updatedAt FROM posts WHERE status = 'published' AND created_at < (SELECT created_at FROM posts WHERE id = ?) ORDER BY created_at DESC LIMIT 1`).get(id) as Record<string, unknown> | undefined;
+  return {
+    prev: prevRow ? mapRow(prevRow) : null,
+    next: nextRow ? mapRow(nextRow) : null,
+  };
+}
+
+export function incrementViews(id: number): void {
+  const db = getDb();
+  db.prepare('UPDATE posts SET views = views + 1 WHERE id = ?').run(id);
 }
 
 export function createPost(title: string, content: string, status: PostStatus = 'published'): Post {
@@ -47,7 +63,7 @@ export function createPost(title: string, content: string, status: PostStatus = 
   const now = new Date().toISOString();
   const result = db.prepare('INSERT INTO posts (title, content, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?)').run(title, content, status, now, now);
   const id = Number(result.lastInsertRowid);
-  return { id, title, content, status, createdAt: now, updatedAt: now };
+  return { id, title, content, status, views: 0, createdAt: now, updatedAt: now };
 }
 
 export function updatePost(id: number, title: string, content: string, status?: PostStatus): Post | undefined {
@@ -61,7 +77,7 @@ export function updatePost(id: number, title: string, content: string, status?: 
   const now = new Date().toISOString();
   const createdAt = (status === 'published' && existing.status !== 'published') ? now : existing.createdAt; 
   db.prepare('UPDATE posts SET title = ?, content = ?, status = ?, created_at = ?, updated_at = ? WHERE id = ?').run(title, content, newStatus, createdAt, now, id);
-  return { id, title, content, status: newStatus, createdAt: existing.createdAt, updatedAt: now };
+  return { id, title, content, status: newStatus, views: existing.views, createdAt, updatedAt: now };
 }
 
 export function deletePost(id: number): boolean {

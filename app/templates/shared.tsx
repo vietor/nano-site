@@ -10,6 +10,7 @@ export interface HomeTemplateProps {
 export interface PostTemplateProps {
   config: SiteConfig;
   post: Post | null;
+  adjacent?: { prev: Post | null; next: Post | null };
 }
 
 export function formatDate(isoString: string): string {

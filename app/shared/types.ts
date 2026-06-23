@@ -5,6 +5,7 @@ export interface Post {
   title: string;
   content: string;
   status: PostStatus;
+  views: number;
   createdAt: string;
   updatedAt: string;
 }

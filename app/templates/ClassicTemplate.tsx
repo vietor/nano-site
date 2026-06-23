@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import type { SiteConfig } from "@/app/shared/types";
 import { MarkdownViewer } from "@/app/shared/md";
@@ -92,7 +90,7 @@ export default function ClassicHomeTemplate({
   );
 }
 
-export function ClassicPostTemplate({ config, post }: PostTemplateProps) {
+export function ClassicPostTemplate({ config, post, adjacent }: PostTemplateProps) {
   return (
     <div className="min-h-screen bg-zinc-50">
       <SiteHeader config={config} />
@@ -103,7 +101,7 @@ export function ClassicPostTemplate({ config, post }: PostTemplateProps) {
         {post ? (
           <article className="bg-white rounded-lg p-8 shadow-sm border border-zinc-200 mt-6">
             <p className="text-zinc-400 text-sm mb-4">
-              发布于 {formatDate(post.createdAt)}
+              发布于 {formatDate(post.createdAt)} · {post.views} 次阅读
             </p>
             <h1 className="text-2xl font-semibold mb-4 text-zinc-900">
               {post.title}
@@ -112,6 +110,26 @@ export function ClassicPostTemplate({ config, post }: PostTemplateProps) {
           </article>
         ) : (
           <p className="text-center text-zinc-500 mt-12 mb-12">文章不存在</p>
+        )}
+        {adjacent && (adjacent.prev || adjacent.next) && (
+          <nav className="flex justify-between gap-4 mt-6">
+            <div className="flex-1 min-w-0">
+              {adjacent.prev && (
+                <Link prefetch={false} href={`/post/${adjacent.prev.id}`} className="block bg-white rounded-lg p-4 border border-zinc-200 hover:border-zinc-400">
+                  <span className="text-zinc-400 text-xs">上一篇</span>
+                  <span className="block text-sm text-zinc-700 truncate">{adjacent.prev.title}</span>
+                </Link>
+              )}
+            </div>
+            <div className="flex-1 min-w-0 text-right">
+              {adjacent.next && (
+                <Link prefetch={false} href={`/post/${adjacent.next.id}`} className="block bg-white rounded-lg p-4 border border-zinc-200 hover:border-zinc-400">
+                  <span className="text-zinc-400 text-xs">下一篇</span>
+                  <span className="block text-sm text-zinc-700 truncate">{adjacent.next.title}</span>
+                </Link>
+              )}
+            </div>
+          </nav>
         )}
       </main>
       <SiteFooter config={config} />

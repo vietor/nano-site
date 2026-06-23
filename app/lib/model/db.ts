@@ -31,6 +31,13 @@ export function verifyPassword(password: string, stored: string): boolean {
 
 function initTables() {
   if (!db) return;
+
+  const ensureColumn = (table: string, column: string, def: string) => {
+    const cols = db!.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[];
+    if (!cols.some(c => c.name === column)) {
+      db!.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${def}`);
+    }
+  };
   db.exec(`
     CREATE TABLE IF NOT EXISTS config (
       key TEXT PRIMARY KEY,
@@ -43,11 +50,13 @@ function initTables() {
       title TEXT NOT NULL,
       content TEXT NOT NULL,
       status TEXT NOT NULL,
+      views INTEGER NOT NULL DEFAULT 0,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
   `);
   db.exec(`CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);`);
+  ensureColumn('posts', 'views', 'INTEGER NOT NULL DEFAULT 0');
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -18,6 +18,11 @@ export function generateMetadata(): Metadata {
   return {
     title: config.title,
     description: config.description,
+    alternates: {
+      types: {
+        'application/rss+xml': '/feed.xml',
+      },
+    },
   };
 }
 
